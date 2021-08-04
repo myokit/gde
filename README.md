@@ -7,6 +7,14 @@ GDE was originally part of [Myokit](https://github.com/MichaelClerx/myokit), but
 
 ## Install
 
-TODO
+`pip install gde`
+
+## Usage
+
+To run, simply type `gde`, or `python3 -m gde`.
+
+- To load a file, use `gde gui file.gde`.
+- To install shortcuts and register file types: `gde icons`
+- For more options, try `gde --help`
 
 
