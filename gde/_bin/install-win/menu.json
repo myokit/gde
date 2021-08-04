@@ -1,0 +1,13 @@
+{
+    "menu_name": "Graph Data Extractpr",
+    "menu_items":
+        [
+            {
+                "name": "Graph data extractor",
+                "script": "${PYTHON_SCRIPTS}/gde.exe",
+                "scriptarguments": ["gde"],
+                "workdir": "${PREFIX}",
+                "icon": "{{icons}}/icon-gde.ico"
+            }
+        ]
+}
