@@ -20,7 +20,7 @@ QtCore.Property = QtCore.pyqtProperty
 # Stand alone applications
 class Application(QtWidgets.QMainWindow):
     """
-    Base class for GDE applications.
+    Base class for applications.
 
     *Extends*: ``QtWidgets.QMainWindow``.
     """
@@ -28,7 +28,7 @@ class Application(QtWidgets.QMainWindow):
 
 def run(app, *args):
     """
-    Runs a :class:`GDEApplication` as a stand-alone application.
+    Runs a :class:`Application` as a stand-alone application.
 
     Arguments:
 
@@ -46,7 +46,7 @@ def run(app, *args):
     # Test application class
     if not issubclass(app, Application):
         raise ValueError(
-            'Application must be a subclass of GDEkitApplication.')
+            'Application must be a subclass of gde.qt.Application.')
 
     # Create Qt app
     a = QtWidgets.QApplication([])
