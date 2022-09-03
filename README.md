@@ -19,4 +19,6 @@ To run, simply type `gde`, or `python3 -m gde`.
 - To install shortcuts and register file types: `gde icons`
 - For more options, try `gde --help`
 
+![A screenshot of the GDE tool](./screenshot.png)
+
 
