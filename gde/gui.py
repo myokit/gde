@@ -3391,7 +3391,7 @@ class AxisItem(SceneItem):
                     # Flat angle, draw from left to right
                     x1, y1 = sx1, y0 + slope * (sx1 - x0)
                     x2, y2 = sx2, y0 + slope * (sx2 - x0)
-            self._coords = (x1, y1, x2, y2)
+            self._coords = int(x1), int(y1), int(x2), int(y2)
             # Update scene
             scene.update()
 
@@ -3488,7 +3488,8 @@ class AxisPointItem(DraggableItem):
         d1 = self._d
         r2 = 0.75 * r1
         r3 = 0.75 * r2
-        d3 = 2.0 * r3
+        d3 = 2 * r3
+        r2, r3, d3 = int(r2), int(r3), int(d3)
         if self.isSelected() or self.hasFocus():
             painter.drawEllipse(-r1, -r1, d1, d1)
         painter.drawEllipse(-r3, -r3, d3, d3)
@@ -3741,7 +3742,8 @@ class DataPointItem(DraggableItem):
         d1 = self._d
         r2 = 0.75 * r1
         r3 = 0.75 * r2
-        d3 = 2.0 * r3
+        d3 = 2 * r3
+        r2, r3, d3 = int(r2), int(r3), int(d3)
         if self.isSelected() or self.hasFocus():
             painter.drawEllipse(-r1, -r1, d1, d1)
         painter.drawEllipse(-r3, -r3, d3, d3)
