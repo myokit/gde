@@ -10,11 +10,27 @@ import sys
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 
-
-# Fix PyQt naming issues
+# Add names that PyQt has decided should be different
 QtCore.Signal = QtCore.pyqtSignal
 QtCore.Slot = QtCore.pyqtSlot
 QtCore.Property = QtCore.pyqtProperty
+
+
+# Deal with PyQt6 changes
+# See https://www.pythonguis.com/faq/pyqt5-vs-pyqt6/
+# See https://www.pythonguis.com/faq/pyqt6-vs-pyside6/
+if False:
+    # QAction moved from QtWidgets to QtGui
+    QtWidgets.QAction = QtGui.QAction
+
+    # exec_ was renamed to exec
+    QtWidgets.QApplication.exec_ = QtWidgets.QApplication.exec
+
+# Load Gnome theme on Wayland
+if sys.platform == 'linux':
+    icon = QtGui.QIcon.fromTheme('document-new')
+    if icon.isNull():
+        QtGui.QIcon.setThemeName('gnome')
 
 
 # Stand alone applications

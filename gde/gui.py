@@ -1788,7 +1788,7 @@ class DocumentModel(QtCore.QAbstractItemModel):
         if not index.isValid():
             return None
         # Only return nodes for display
-        if role != Qt.DisplayRole:
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
         # Get the node this index points at
         item = index.internalPointer()
@@ -1802,13 +1802,13 @@ class DocumentModel(QtCore.QAbstractItemModel):
         Returns the relevant flags for the item at this index.
         """
         # All items are enabled
-        flags = Qt.ItemIsEnabled
+        flags = Qt.ItemFlag.ItemIsEnabled
         # You can drop an item anywhere, even outside the range of valid
         # indices.
         if not index.isValid():
             return flags
         # Allow selecting items
-        flags |= Qt.ItemIsSelectable
+        flags |= Qt.ItemFlag.ItemIsSelectable
         # Return flags
         return flags
 
@@ -1817,10 +1817,10 @@ class DocumentModel(QtCore.QAbstractItemModel):
         Return the header for the row/column requested as ``section``.
         """
         # Only provide header for display, not for editing(?)
-        if role != Qt.DisplayRole:
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
         # Only provide horizontal header
-        if orientation == Qt.Horizontal:
+        if orientation == Qt.Orientation.Horizontal:
             return ('Name', 'Type')[section]
         else:
             return None
@@ -1876,8 +1876,8 @@ class DocumentModel(QtCore.QAbstractItemModel):
         """
         Returns a flag indicating the supported drop actions for QItems.
         """
-        return QtCore.Qt.MoveAction
-        # | QtCore.Qt.CopyAction
+        return Qt.DropAction.MoveAction
+        # | Qt.DropAction.CopyAction
 
 
 #
@@ -1899,7 +1899,7 @@ class GraphDataExtractor(Application):
         # Set size, center
         self.resize(800, 600)
         qr = self.frameGeometry()
-        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         # Add image widget
@@ -1909,10 +1909,12 @@ class GraphDataExtractor(Application):
         self._scene.mouse_moved.connect(self.handle_mouse_moved)
         # Add property docks
         self._document_dock = DocumentEditDock(self)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self._document_dock)
+        self.addDockWidget(
+            Qt.DockWidgetArea.LeftDockWidgetArea, self._document_dock)
         self._variable_dock = DocumentVariableEditDock(
             self, self._document_dock)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self._variable_dock)
+        self.addDockWidget(
+            Qt.DockWidgetArea.LeftDockWidgetArea, self._variable_dock)
         # Cursor position label on status bar
         self._label_cursor = QtWidgets.QLabel()
         self.statusBar().addPermanentWidget(self._label_cursor)
@@ -2021,7 +2023,9 @@ class GraphDataExtractor(Application):
             self,
             'Open gde file',
             self._path,
-            filter='Gde files (*.gde)')[0]
+            filter='Gde files (*.gde)',
+            #options = QtWidgets.QFileDialog.Option.DontUseNativeDialog,
+        )[0]
         if fname:
             fname = str(fname)
             if fname:
@@ -2052,13 +2056,13 @@ class GraphDataExtractor(Application):
         """
         self.clear_focus()
         if self._document.has_changes() and self._file is not None:
-            box = QtWidgets.QMessageBox
-            reply = box.question(
+            sb = QtWidgets.QMessageBox.StandardButton
+            reply = QtWidgets.QMessageBox.question(
                 self,
                 TITLE,
                 'Undo all changes since last save?',
-                box.Yes | box.No)
-            if reply == box.Yes:
+                sb.Yes | sb.No)
+            if reply == sb.Yes:
                 self.load_document(self._file)
 
     def action_save(self, save_as=False):
@@ -2418,16 +2422,16 @@ class GraphDataExtractor(Application):
         changes to save. Returns False if the user selected "cancel".
         """
         if self._document.has_changes():
-            box = QtWidgets.QMessageBox
-            reply = box.question(
+            sb = QtWidgets.QMessageBox.StandardButton
+            reply = QtWidgets.QMessageBox.question(
                 self,
                 TITLE,
                 'Save changes to document?',
-                box.Yes | box.No | box.Cancel)
-            if reply == box.Yes:
+                sb.Yes | sb.No | sb.Cancel)
+            if reply == sb.Yes:
                 self.action_save()
                 return True
-            elif reply == box.No:
+            elif reply == sb.No:
                 return True
             else:
                 return False
@@ -2554,7 +2558,8 @@ class DocumentTreeView(QtWidgets.QTreeView):
             new = node.get_model_selection()
             if new != self._sm.selection():
                 self._sm.clearSelection()
-                self._sm.select(new, QtCore.QItemSelectionModel.Select)
+                self._sm.select(
+                    new, QtCore.QItemSelectionModel.SelectionFlag.Select)
                 index = node.get_model_index()
                 while index.isValid():
                     self.expand(index)
@@ -2568,8 +2573,10 @@ class DocumentTreeView(QtWidgets.QTreeView):
         # Set document model
         self.setModel(document.get_model())
         # Set single/multiple selection mode
-        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         # Expand tree a little
         self.expandToDepth(2)
         # React to changes in selected node
@@ -2797,14 +2804,14 @@ class GdeView(QtWidgets.QGraphicsView):
         # Always track mouse position
         self.setMouseTracking(True)
         # Set crosshair cursor
-        self.setCursor(Qt.CrossCursor)
+        self.setCursor(Qt.CursorShape.CrossCursor)
         # Set rendering hints
-        self.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         #self.setViewportUpdateMode(
         #    QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
         # Fit scene rect in view
         self.fitInView(self.sceneRect())
-        self.setAlignment(Qt.AlignLeft)
+        self.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def resizeEvent(self, event):
         """
@@ -2924,8 +2931,8 @@ class GdeScene(QtWidgets.QGraphicsScene):
         """
         Double-click: set background image.
         """
-        if event.button() == QtCore.Qt.LeftButton:
-            if event.modifiers() == Qt.NoModifier:
+        if event.button() == Qt.MouseButton.LeftButton:
+            if event.modifiers() == Qt.KeyboardModifier.NoModifier:
                 self._gde.action_set_image()
                 return
         return QtWidgets.QGraphicsScene.mouseDoubleClickEvent(self, event)
@@ -2934,8 +2941,8 @@ class GdeScene(QtWidgets.QGraphicsScene):
         """
         Ctrl-Click: add data point
         """
-        if event.button() == QtCore.Qt.LeftButton:
-            if event.modifiers() == Qt.ControlModifier:
+        if event.button() == Qt.MouseButton.LeftButton:
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
                 p = event.scenePos()
                 x, y = self.scene2norm(p.x(), p.y())
                 self._gde.action_add_data_point(x, y)
@@ -3006,7 +3013,7 @@ class SceneItem(QtWidgets.QGraphicsItem):
         """
         Deselects this node, if possible.
         """
-        if self.flags() and QtWidgets.QGraphicsItem.ItemIsSelectable:
+        if self.flags() and SceneItem.GraphicsItemFlag.ItemIsSelectable:
             if self.isSelected():
                 self.setSelected(False)
                 self.setZValue(self._original_z_index)
@@ -3042,7 +3049,7 @@ class SceneItem(QtWidgets.QGraphicsItem):
         """
         Handles event when this item has changed
         """
-        if change == QtWidgets.QGraphicsItem.ItemSceneHasChanged:
+        if change == SceneItem.GraphicsItemChange.ItemSceneHasChanged:
             self.set_scene(value)
         return QtWidgets.QGraphicsItem.itemChange(self, change, value)
 
@@ -3071,7 +3078,7 @@ class SceneItem(QtWidgets.QGraphicsItem):
         """
         Selects this node, if possible.
         """
-        if self.flags() and QtWidgets.QGraphicsItem.ItemIsSelectable:
+        if self.flags() and SceneItem.GraphicsItemFlag.ItemIsSelectable:
             if not self.isSelected():
                 self.setSelected(True)
                 self.setFocus()
@@ -3115,18 +3122,18 @@ class DraggableItem(SceneItem):
         super(DraggableItem, self).__init__(node, parent)
 
         # Allow moving and selecting
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
+        self.setFlag(SceneItem.GraphicsItemFlag.ItemIsMovable)
+        self.setFlag(SceneItem.GraphicsItemFlag.ItemIsSelectable)
 
         # Allow keyboard focus & keyboard events
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable)
+        self.setFlag(SceneItem.GraphicsItemFlag.ItemIsFocusable)
 
         # Enable move and geometry change events
-        self.setFlag(QtWidgets.QGraphicsItem.ItemSendsGeometryChanges)
+        self.setFlag(SceneItem.GraphicsItemFlag.ItemSendsGeometryChanges)
 
         # Set cursor, only allow left mouse button
-        self.setCursor(Qt.OpenHandCursor)
-        self.setAcceptedMouseButtons(Qt.LeftButton)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.setAcceptedMouseButtons(Qt.MouseButton.LeftButton)
 
         # Used to gather dragging into a single event
         self._original_location = False
@@ -3135,14 +3142,14 @@ class DraggableItem(SceneItem):
         """
         Mouse pressed? Then show drag icon and allow moving
         """
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
         return QtWidgets.QGraphicsItem.mousePressEvent(self, event)
 
     def mouseMoveEvent(self, event):
         """
         Item being moved using the mouse.
         """
-        self.setCursor(Qt.BlankCursor)
+        self.setCursor(Qt.CursorShape.BlankCursor)
         if not self._original_location:
             self._original_location = self.pos()
         return QtWidgets.QGraphicsItem.mouseMoveEvent(self, event)
@@ -3151,7 +3158,7 @@ class DraggableItem(SceneItem):
         """
         Mouse button released again.
         """
-        self.setCursor(Qt.OpenHandCursor)
+        self.setCursor(Qt.CursorShape.OpenHandCursor)
         if self._original_location:
             p = self.pos()
             if p != self._original_location:
@@ -3166,7 +3173,8 @@ class DraggableItem(SceneItem):
         scene = self.scene()
         node = self.get_node()
         if scene:
-            if change == QtWidgets.QGraphicsItem.ItemPositionChange:
+            change_enum = DraggableItem.GraphicsItemChange
+            if change == change_enum.ItemPositionChange:
                 # Item has been moved, check if it stays within the scene
                 rect = scene.sceneRect()
                 if not rect.contains(value):
@@ -3176,7 +3184,7 @@ class DraggableItem(SceneItem):
                 value.setX(x)
                 value.setY(y)
                 self.handle_drag_live(x, y)
-            elif change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
+            elif change == change_enum.ItemSelectedHasChanged:
                 # Item has been selected or deselected
                 if value:
                     node.select()
@@ -3218,7 +3226,7 @@ class ImageItem(SceneItem):
         self.setZValue(Z_BACKGROUND)
         self._image = None
         # Allow selecting
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable)
+        self.setFlag(ImageItem.GraphicsItemFlag.ItemIsSelectable)
 
     def boundingRect(self):
         """
@@ -3266,7 +3274,7 @@ class ImageItem(SceneItem):
             painter.setOpacity(0.7)
             painter.setFont(QtGui.QFont('Decorative', 200))
             painter.drawText(
-                self.scene().sceneRect(), QtCore.Qt.AlignCenter, text)
+                self.scene().sceneRect(), Qt.AlignmentFlag.AlignCenter, text)
 
 
 class AxisItem(SceneItem):
@@ -3469,14 +3477,14 @@ class AxisPointItem(DraggableItem):
         """
         A key is pressed while this item has focus.
         """
-        if self._dragging and event.key() == Qt.Key_Control:
+        if self._dragging and event.key() == Qt.Key.Key_Control:
             self._restrict = True
 
     def keyReleaseEvent(self, event):
         """
         A key is released while this item has focus.
         """
-        if self._dragging and event.key() == Qt.Key_Control:
+        if self._dragging and event.key() == Qt.Key.Key_Control:
             self._restrict = False
 
     def paint(self, painter, option, widget):
@@ -3728,7 +3736,7 @@ class DataPointItem(DraggableItem):
         """
         A key is pressed while this item has focus.
         """
-        if event.key() == Qt.Key_Delete:
+        if event.key() == Qt.Key.Key_Delete:
             self.get_node().remove()
         else:
             return QtWidgets.QGraphicsItem.keyPressEvent(self, event)
