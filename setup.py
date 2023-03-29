@@ -40,7 +40,7 @@ setup(
     author_email='michael@myokit.org',
 
     # Required Python version
-    python_requires='>=3.5',
+    python_requires='>=3.6',
 
     # Packages to include
     packages=find_packages(include=('gde', 'gde.*')),
