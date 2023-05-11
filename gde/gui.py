@@ -980,10 +980,15 @@ class GdeDocument(Document):
         # Get unit vectors on the displaced (axis)
         # For rx, the tail will be on the line x=0 but the y value still
         # depends on where the axis was displayed in the original graph.
-        rx = Line2D(rx.point(-vx0 / (vx1 - vx0)),
-                    rx.point((1.0 - vx0) / (vx1 - vx0)))
-        ry = Line2D(ry.point(-vy0 / (vy1 - vy0)),
-                    ry.point((1.0 - vy0) / (vy1 - vy0)))
+        dx = vx1 - vx0
+        if dx == 0:
+            dx = 1e-12
+        rx = Line2D(rx.point(-vx0 / dx), rx.point((1 - vx0) / dx))
+
+        dy = vy1 - vy0
+        if dy == 0:
+            dy = 1e-12
+        ry = Line2D(ry.point(-vy0 / dy), ry.point((1 - vy0) / dy))
 
         # Now we swap rx and ry around so rx' tail is where ry's tail was and
         # vice versa.
