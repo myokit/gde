@@ -7,8 +7,8 @@
 import signal
 import sys
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import Qt
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtCore import Qt
 
 # Add names that PyQt has decided should be different
 QtCore.Signal = QtCore.pyqtSignal
@@ -19,12 +19,10 @@ QtCore.Property = QtCore.pyqtProperty
 # Deal with PyQt6 changes
 # See https://www.pythonguis.com/faq/pyqt5-vs-pyqt6/
 # See https://www.pythonguis.com/faq/pyqt6-vs-pyside6/
-if False:
-    # QAction moved from QtWidgets to QtGui
-    QtWidgets.QAction = QtGui.QAction
-
-    # exec_ was renamed to exec
-    QtWidgets.QApplication.exec_ = QtWidgets.QApplication.exec
+# QAction moved from QtWidgets to QtGui
+QtWidgets.QAction = QtGui.QAction
+# exec_ was renamed to exec
+QtWidgets.QApplication.exec_ = QtWidgets.QApplication.exec
 
 # Load Gnome theme on Wayland
 if sys.platform == 'linux':

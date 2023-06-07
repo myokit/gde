@@ -54,7 +54,7 @@ setup(
     install_requires=[
         'configparser',
         'numpy',
-        'pyqt5',
+        'pyqt6',
         'setuptools',
         'sip',
     ],
